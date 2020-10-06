@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>com.aniruddha</groupId>
 	<artifactId>gcloud-kms-poc</artifactId>
-	<version>0.0.1</version>
+	<version>v1.2</version>
 	<name>gcloud-kms-poc</name>
 	<description>KMS implementation</description>
 

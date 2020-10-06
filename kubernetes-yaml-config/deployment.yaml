@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: gcloud-kms-poc
+  name: gcloud-kms-poc
+  namespace: default
+spec:
+  replicas: 1
+  minReadySeconds: 100
+  selector:
+    matchLabels:
+      app: gcloud-kms-poc
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: gcloud-kms-poc
+    spec:
+      #volumes:
+      #- name: google-cloud-key
+        #secret:
+         # secretName: cluster-key2
+      containers:
+      - name: gcloud-kms-poc
+        image: gcr.io/victoralpha20/gcloud-kms-poc:v1.2
+        #volumeMounts:
+        #- name: google-cloud-key
+         # mountPath: /var/secrets/google
+       # env:  
+        #- name: GOOGLE_APPLICATION_CREDENTIALS
+         # value: /var/secrets/google/.key.json
+          #getting data from configMap
+        #- name: FNAME
+         # valueFrom: 
+          #  configMapKeyRef:
+           #   key: FNAME
+            #  name: app-poc-config
+        #- name: LNAME
+         # valueFrom:
+          #  configMapKeyRef:
+           #   key: LNAME
+            #  name: app-poc-config
+        #- name: CITY
+         # valueFrom:
+          #  configMapKeyRef:
+           #   key: CITY
+            #  name: app-poc-config #config map name in kubernetes; to change this name go to configmap.yaml
+        #- name: KMS_PASSWORD
+         # valueFrom:
+          #  secretKeyRef:
+           #   key: KMS_PASSWORD
+            #  name: app-secrets
+        resources:
+          requests:
+            cpu: "100m"
+        imagePullPolicy: Always
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: gcloud-kms-poc
+  name: gcloud-kms-poc
+  namespace: default
+spec:
+  ports:
+ #- nodePort: 31556
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: gcloud-kms-poc
+  sessionAffinity: None
+  type: LoadBalancer
