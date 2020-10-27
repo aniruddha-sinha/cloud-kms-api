@@ -2,15 +2,15 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: gcloud-kms-poc
-  name: gcloud-kms-poc
+    app: cloud-kms-api
+  name: cloud-kms-api
   namespace: default
 spec:
   replicas: 1
   minReadySeconds: 100
   selector:
     matchLabels:
-      app: gcloud-kms-poc
+      app: cloud-kms-api
   strategy:
     rollingUpdate:
       maxSurge: 25%
@@ -19,21 +19,21 @@ spec:
   template:
     metadata:
       labels:
-        app: gcloud-kms-poc
+        app: cloud-kms-api
     spec:
-      #volumes:
-      #- name: google-cloud-key
-        #secret:
-         # secretName: cluster-key2
+      volumes:
+      - name: google-cloud-key
+        secret:
+          secretName: cluster-key2
       containers:
-      - name: gcloud-kms-poc
-        image: gcr.io/victoralpha20/gcloud-kms-poc:v1.2
-        #volumeMounts:
-        #- name: google-cloud-key
-         # mountPath: /var/secrets/google
-       # env:  
-        #- name: GOOGLE_APPLICATION_CREDENTIALS
-         # value: /var/secrets/google/.key.json
+      - name: cloud-kms-api
+        image: aniruddhasinha/cloud-kms-api:v1.2
+        volumeMounts:
+        - name: google-cloud-key
+          mountPath: /var/secrets/google
+        env:  
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /var/secrets/google/.key.json
           #getting data from configMap
         #- name: FNAME
          # valueFrom: 
@@ -67,8 +67,8 @@ apiVersion: v1
 kind: Service
 metadata:
   labels:
-    app: gcloud-kms-poc
-  name: gcloud-kms-poc
+    app: cloud-kms-api
+  name: cloud-kms-api
   namespace: default
 spec:
   ports:
@@ -77,6 +77,6 @@ spec:
     protocol: TCP
     targetPort: 8080
   selector:
-    app: gcloud-kms-poc
+    app: cloud-kms-api
   sessionAffinity: None
   type: LoadBalancer
